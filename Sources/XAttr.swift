@@ -234,7 +234,7 @@ private func listXAttr<T>(target: T, options: XAttrOptions, listFunc: (T, Unsafe
 ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/getxattr.2.html
-private func getXAttr<T>(target: T, name: String, options: XAttrOptions, getFunc: (T, UnsafePointer<CChar>, UnsafeMutablePointer<Void>, size_t, CUnsignedInt, CInt) -> ssize_t) throws -> NSData {
+private func getXAttr<T>(target: T, name: String, options: XAttrOptions, getFunc: (T, UnsafePointer<CChar>, UnsafeMutableRawPointer, size_t, CUnsignedInt, CInt) -> ssize_t) throws -> NSData {
     assert(options.isSubset(of: [.NoFollow, .ShowCompression]),
         "Extended attribute getter only supports the following XAttrOptions: .NoFollow, .ShowCompression")
 
@@ -275,7 +275,7 @@ private func getXAttr<T>(target: T, name: String, options: XAttrOptions, getFunc
 ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/setxattr.2.html
-private func setXAttr<T>(target: T, name: String, value: NSData, options: XAttrOptions, setFunc: (T, UnsafePointer<CChar>, UnsafePointer<Void>, size_t, CUnsignedInt, CInt) -> CInt) throws {
+private func setXAttr<T>(target: T, name: String, value: NSData, options: XAttrOptions, setFunc: (T, UnsafePointer<CChar>, UnsafeRawPointer, size_t, CUnsignedInt, CInt) -> CInt) throws {
     assert(options.isSubset(of: [.NoFollow, .CreateOnly, .ReplaceOnly]),
         "Extended attribute setter only supports the following XAttrOptions: .NoFollow, .CreateOnly, .ReplaceOnly")
 
