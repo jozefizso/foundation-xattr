@@ -187,7 +187,7 @@ extension ExtendedAttributeHandler {
 ///           `NSCocoaErrorDomain` and error code `NSFileReadInapplicableStringEncodingError` is thrown.
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/listxattr.2.html
-private func listXAttr<T>(target: T, options: XAttrOptions, listFunc: (T, UnsafeMutablePointer<CChar>, size_t, CInt) -> ssize_t) throws -> [String] {
+private func listXAttr<T>(target: T, options: XAttrOptions, listFunc: (T, UnsafeMutablePointer<CChar>?, size_t, CInt) -> ssize_t) throws -> [String] {
     assert(options.isSubset(of: [.NoFollow, .ShowCompression]),
         "Extended attribute lister only supports the following XAttrOptions: .NoFollow, .ShowCompression")
 
@@ -234,7 +234,7 @@ private func listXAttr<T>(target: T, options: XAttrOptions, listFunc: (T, Unsafe
 ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/getxattr.2.html
-private func getXAttr<T>(target: T, name: String, options: XAttrOptions, getFunc: (T, UnsafePointer<CChar>, UnsafeMutableRawPointer, size_t, CUnsignedInt, CInt) -> ssize_t) throws -> NSData {
+private func getXAttr<T>(target: T, name: String, options: XAttrOptions, getFunc: (T, UnsafePointer<CChar>, UnsafeMutableRawPointer?, size_t, CUnsignedInt, CInt) -> ssize_t) throws -> NSData {
     assert(options.isSubset(of: [.NoFollow, .ShowCompression]),
         "Extended attribute getter only supports the following XAttrOptions: .NoFollow, .ShowCompression")
 
