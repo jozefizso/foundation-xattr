@@ -397,8 +397,8 @@ extension NSURL: ExtendedAttributeHandler {
 }
 
 
-/// Provides `NSFileHandle` with the ability to manipulate extended attributes associated with file descriptors.
-extension NSFileHandle: ExtendedAttributeHandler {
+/// Provides `FileHandle` with the ability to manipulate extended attributes associated with file descriptors.
+extension FileHandle: ExtendedAttributeHandler {
 
     /// Retrieves the extended attribute names associated with this file.
     ///
