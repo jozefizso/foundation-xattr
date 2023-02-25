@@ -203,10 +203,10 @@ private func listXAttr<T>(target target: T, options: XAttrOptions, listFunc: (T,
         throw NSError.POSIX(errno: errno)
     }
 
-    guard let list = String(data: data, encoding: NSUTF8StringEncoding) else {
+    guard let list = String(data: data, encoding: .utf8) else {
         throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadInapplicableStringEncodingError, userInfo: [
             NSLocalizedDescriptionKey: "Could not decode extended attribute names.",
-            NSStringEncodingErrorKey: NSNumber(unsignedInteger: NSUTF8StringEncoding),
+            NSStringEncodingErrorKey: NSNumber(value: NSUTF8StringEncoding),
         ])
     }
     return list.componentsSeparatedByString("\0").filter({ !$0.isEmpty })
