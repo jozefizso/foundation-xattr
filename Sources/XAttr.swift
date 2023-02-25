@@ -336,7 +336,7 @@ extension NSURL: ExtendedAttributeHandler {
     ///           retrieved, but cannot be read due to bad encoding, an `NSError` with Foundation built-in domain
     ///           `NSCocoaErrorDomain` and error code `NSFileReadInapplicableStringEncodingError` is thrown.
     public func extendedAttributeNames(options options: XAttrOptions = []) throws -> [String] {
-        assert(self.fileURL, "Extended attributes are only available for file URLs")
+        assert(self.isFileURL, "Extended attributes are only available for file URLs")
         return try listXAttr(target: self.fileSystemRepresentation, options: options, listFunc: listxattr)
     }
 
@@ -355,7 +355,7 @@ extension NSURL: ExtendedAttributeHandler {
     /// - throws: `NSError` with Foundation built-in domain `NSPOSIXErrorDomain`. Check the _code_ property for the
     ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
     public func extendedAttributeValue(forName name: String, options: XAttrOptions = []) throws -> NSData {
-        assert(self.fileURL, "Extended attributes are only available for file URLs")
+        assert(self.isFileURL, "Extended attributes are only available for file URLs")
         return try getXAttr(target: self.fileSystemRepresentation, name: name, options: options, getFunc: getxattr)
     }
 
@@ -374,7 +374,7 @@ extension NSURL: ExtendedAttributeHandler {
     /// - throws: `NSError` with Foundation built-in domain `NSPOSIXErrorDomain`. Check the _code_ property for the
     ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
     public func setExtendedAttribute(name name: String, value: NSData, options: XAttrOptions = []) throws {
-        assert(self.fileURL, "Extended attributes are only available for file URLs")
+        assert(self.isFileURL, "Extended attributes are only available for file URLs")
         try setXAttr(target: self.fileSystemRepresentation, name: name, value: value, options: options, setFunc: setxattr)
     }
 
@@ -390,7 +390,7 @@ extension NSURL: ExtendedAttributeHandler {
     /// - throws: `NSError` with Foundation built-in domain `NSPOSIXErrorDomain`. Check the _code_ property for the
     ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
     public func removeExtendedAttribute(forName name: String, options: XAttrOptions = []) throws {
-        assert(self.fileURL, "Extended attributes are only available for file URLs")
+        assert(self.isFileURL, "Extended attributes are only available for file URLs")
         try removeXAttr(target: self.fileSystemRepresentation, name: name, options: options, delFunc: removexattr)
     }
 
