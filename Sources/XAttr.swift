@@ -33,7 +33,7 @@ public let ExtendedAttributeNameKey: String = "tech.overbuilt.userInfoKey.extend
 ///
 /// - important: Options `.CreateOnly` and `.ReplaceOnly` are mutually exclusive. However, neither option is required,
 ///              and supplying neither when setting an extended attribute allows for both creation and replacement.
-public struct XAttrOptions: OptionSetType {
+public struct XAttrOptions: OptionSet {
     public let rawValue: CInt
 
     public init(rawValue: CInt) { self.rawValue = rawValue }
