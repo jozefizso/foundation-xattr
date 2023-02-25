@@ -512,9 +512,10 @@ extension NSError {
     /// - parameter userInfo: Any additional data to include with the error.
     ///
     /// - returns: An `NSError` object with the domain `NSPOSIXErrorDomain`.
-    fileprivate class func POSIX(errno errNo: errno_t, userInfo: [NSObject: AnyObject]? = nil) -> Self {
+    fileprivate class func POSIX(errno errNo: errno_t, userInfo: [String: Any]? = nil) -> Self {
         return self.init(domain: NSPOSIXErrorDomain, code: Int(errNo), userInfo: {
-            if userInfo?[NSLocalizedDescriptionKey] == nil, let description = String(UTF8String: strerror(errNo)) {
+            if userInfo?[NSLocalizedDescriptionKey] == nil {
+                let description = String(cString: strerror(errNo))
                 var mutableUserInfo = userInfo ?? [:]
                 mutableUserInfo[NSLocalizedDescriptionKey] = description
                 return mutableUserInfo
