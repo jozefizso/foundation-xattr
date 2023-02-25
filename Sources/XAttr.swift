@@ -198,8 +198,12 @@ private func listXAttr<T>(target: T, options: XAttrOptions, listFunc: (T, Unsafe
         default: break                                                  // Got the size, continue on.
     }
 
-    let data = NSMutableData(length: size)!                             // This allocation should never fail.
-    guard listFunc(target, UnsafeMutablePointer<CChar>(data.mutableBytes), data.length, options.rawValue) != -1 else {
+    var data = Data(count: size)
+    let errcode = data.withUnsafeMutableBytes{(bytes: UnsafeMutablePointer<CChar>) in
+        return listFunc(target, bytes, size, options.rawValue)
+    }
+
+    guard errcode != -1 else {
         throw NSError.POSIX(errno: errno)
     }
 
@@ -209,7 +213,7 @@ private func listXAttr<T>(target: T, options: XAttrOptions, listFunc: (T, Unsafe
             NSStringEncodingErrorKey: NSNumber(value: NSUTF8StringEncoding),
         ])
     }
-    return list.componentsSeparatedByString("\0").filter({ !$0.isEmpty })
+    return list.components(separatedBy: "\0").filter({ !$0.isEmpty })
 }
 
 /// Gets an extended attribute value from a file system object.
