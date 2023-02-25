@@ -188,7 +188,7 @@ extension ExtendedAttributeHandler {
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/listxattr.2.html
 private func listXAttr<T>(target: T, options: XAttrOptions, listFunc: (T, UnsafeMutablePointer<CChar>, size_t, CInt) -> ssize_t) throws -> [String] {
-    assert(options.isSubsetOf([.NoFollow, .ShowCompression]),
+    assert(options.isSubset(of: [.NoFollow, .ShowCompression]),
         "Extended attribute lister only supports the following XAttrOptions: .NoFollow, .ShowCompression")
 
     let size = listFunc(target, nil, 0, options.rawValue)               // Get the size of the attributes' names.
@@ -235,7 +235,7 @@ private func listXAttr<T>(target: T, options: XAttrOptions, listFunc: (T, Unsafe
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/getxattr.2.html
 private func getXAttr<T>(target: T, name: String, options: XAttrOptions, getFunc: (T, UnsafePointer<CChar>, UnsafeMutablePointer<Void>, size_t, CUnsignedInt, CInt) -> ssize_t) throws -> NSData {
-    assert(options.isSubsetOf([.NoFollow, .ShowCompression]),
+    assert(options.isSubset(of: [.NoFollow, .ShowCompression]),
         "Extended attribute getter only supports the following XAttrOptions: .NoFollow, .ShowCompression")
 
     let size = getFunc(target, name, nil, 0, 0, options.rawValue)       // Get the size of the attribute's value.
@@ -276,7 +276,7 @@ private func getXAttr<T>(target: T, name: String, options: XAttrOptions, getFunc
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/setxattr.2.html
 private func setXAttr<T>(target: T, name: String, value: NSData, options: XAttrOptions, setFunc: (T, UnsafePointer<CChar>, UnsafePointer<Void>, size_t, CUnsignedInt, CInt) -> CInt) throws {
-    assert(options.isSubsetOf([.NoFollow, .CreateOnly, .ReplaceOnly]),
+    assert(options.isSubset(of: [.NoFollow, .CreateOnly, .ReplaceOnly]),
         "Extended attribute setter only supports the following XAttrOptions: .NoFollow, .CreateOnly, .ReplaceOnly")
 
     guard setFunc(target, name, value.bytes, value.length, 0, options.rawValue) == 0 else {
@@ -304,7 +304,7 @@ private func setXAttr<T>(target: T, name: String, value: NSData, options: XAttrO
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/removexattr.2.html
 private func removeXAttr<T>(target: T, name: String, options: XAttrOptions, delFunc: (T, UnsafePointer<CChar>, CInt) -> CInt) throws {
-    assert(options.isSubsetOf([.NoFollow, .ShowCompression]),
+    assert(options.isSubset(of: [.NoFollow, .ShowCompression]),
         "Extended attribute remover only supports the following XAttrOptions: .NoFollow, .ShowCompression")
 
     guard delFunc(target, name, options.rawValue) == 0 else {
