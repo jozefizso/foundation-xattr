@@ -19,7 +19,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Foundation-XAttr",
+    name: "XAttr",
     platforms: [
         .iOS(.v14),
         .macOS(.v10_13),
@@ -28,15 +28,15 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "Foundation-XAttr",
+            name: "XAttr",
             targets: [
-                "Foundation-XAttr",
+                "XAttr",
             ]
         ),
     ],
     targets: [
         .target(
-            name: "Foundation-XAttr",
+            name: "XAttr",
             path: "Sources/"
         )
     ]

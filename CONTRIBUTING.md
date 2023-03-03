@@ -11,4 +11,4 @@ Contributions are welcome! Please follow these guidelines:
 
 ## License
 
-All contributions will be licensed under this project's permissive [ISC License](https://github.com/overbuilt/foundation-xattr/blob/master/LICENSE).
+All contributions will be licensed under this project's permissive [ISC License](LICENSE.txt).
