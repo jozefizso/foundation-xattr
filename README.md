@@ -1,8 +1,8 @@
-# Foundation-XAttr
+# XAttr
 
-Foundation-XAttr makes working with [Extended Attributes][wiki-xattr] a natural part of Foundation. Both `NSURL` and `NSFileHandle` objects gain the ability to read and write extended attributes using an API that fits right in with Cocoa. Add the power of metadata to your app!
+XAttr makes working with [Extended Attributes][wiki-xattr] a natural part of Foundation. Both `NSURL` and `NSFileHandle` objects gain the ability to read and write extended attributes using an API that fits right in with Cocoa. Add the power of metadata to your app!
 
-Works with iOS, macOS, and tvOS.
+Works with iOS, macOS, watchOS and tvOS.
 
 For more info on Darwin's extended attribute APIs – which underlie this module – see Apple's man pages for [listxattr][man-listxattr], [getxattr][man-getxattr], [setxattr][man-setxattr], and [removexattr][man-removexattr].
 
@@ -12,12 +12,15 @@ For more info on Darwin's extended attribute APIs – which underlie this module
 Here's a simple example of working with extended attributes using a file URL:
 
 ```swift
+import XAttr
+
 let myURL = NSURL(fileURLWithPath: "/path/to/file")
 
-let data = "value".dataUsingEncoding(NSUTF8StringEncoding)!
+let data = "value".data(using: .utf8)!
+let nsdata = NSData(data: data)
 
 // Set an attribute
-try myURL.setExtendedAttribute(name: "com.example.attribute", value: data)
+try myURL.setExtendedAttribute(name: "com.example.attribute", value: nsdata)
 // List attributes
 let names = try myURL.extendedAttributeNames()
 // Get an attribute's value
@@ -26,7 +29,7 @@ let value = try myURL.extendedAttributeValue(forName: "com.example.attribute")
 try myURL.removeExtendedAttribute(forName: "com.example.attribute")
 
 // Set multiple attributes
-try myURL.setExtendedAttributes(["com.example.attribute1": data, "com.example.attribute2": data])
+try myURL.setExtendedAttributes(attrs: ["com.example.attribute1": nsdata, "com.example.attribute2": nsdata])
 // Get multiple attributes' values (all available)
 let attrs = try myURL.extendedAttributeValues(forNames: nil)
 // Remove multiple attributes (all)
@@ -36,11 +39,11 @@ try myURL.removeExtendedAttributes(forNames: nil)
 
 ## Installation
 
-Requires Swift 2.2.
+Requires Swift 5.3.
 
 ### Swift Package Manager
 
-Add Foundation-XAttr as a dependency to your project:
+Add XAttr as a dependency to your project:
 
 ```swift
 // Package.swift
@@ -50,20 +53,19 @@ import PackageDescription
 let package = Package(
     name: "YourProjectName",
     dependencies: [
-        .Package(url: "https://github.com/overbuilt/foundation-xattr.git", majorVersion: 1),
+        .package(url: "https://github.com/jozefizso/swift-xattr", majorVersion: 1),
     ]
 )
-
 ```
 
 ### Source
 
-If you cannot use the Swift Package Manager, just copy the source file _Foundation-XAttr.swift_ from the _Sources_ directory into your project.
+If you cannot use the Swift Package Manager, just copy the `Sources/XAttr.swift` file into your project.
 
 
 ## Usage
 
-Foundation-XAttr is easy to use. This section contains the all the basic information required. Be sure to check out the Quick Help in Xcode for more detail.
+XAttr is easy to use. This section contains the all the basic information required. Be sure to check out the Quick Help in Xcode for more detail.
 
 ### Methods
 
@@ -92,7 +94,7 @@ setExtendedAttribute(name: String, value: NSData, options: XAttrOptions = []) th
 #### Setting Multiple Attributes' Values
 
 ```swift
-setExtendedAttributes(_: [String: NSData], options: XAttrOptions = []) throws
+setExtendedAttributes(attrs: [String: NSData], options: XAttrOptions = []) throws
 ```
 
 Supply a dictionary of _name_:_value_ pairs to be set on the target.
@@ -141,7 +143,8 @@ Finally, if an error is encountered while getting/setting/removing multiple exte
 
 ## License
 
-Foundation-XAttr is licensed under the permissive [ISC License][license].
+XAttr is licensed under the permissive [ISC License][license].  
+XAttr is a fork of [Foundation-XAttr][upstream] repository.
 
 
 [wiki-xattr]: https://en.wikipedia.org/wiki/Extended_file_attributes
@@ -149,4 +152,5 @@ Foundation-XAttr is licensed under the permissive [ISC License][license].
 [man-getxattr]: https://developer.apple.com/library/ios/documentation/System/Conceptual/ManPages_iPhoneOS/man2/getxattr.2.html
 [man-setxattr]: https://developer.apple.com/library/ios/documentation/System/Conceptual/ManPages_iPhoneOS/man2/setxattr.2.html
 [man-removexattr]: https://developer.apple.com/library/ios/documentation/System/Conceptual/ManPages_iPhoneOS/man2/removexattr.2.html
-[license]: https://github.com/overbuilt/foundation-xattr/blob/master/LICENSE
+[license]: LICENSE.txt
+[upstream]: https://github.com/overbuilt/foundation-xattr

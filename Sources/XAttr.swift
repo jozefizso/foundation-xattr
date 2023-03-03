@@ -33,7 +33,7 @@ public let ExtendedAttributeNameKey: String = "tech.overbuilt.userInfoKey.extend
 ///
 /// - important: Options `.CreateOnly` and `.ReplaceOnly` are mutually exclusive. However, neither option is required,
 ///              and supplying neither when setting an extended attribute allows for both creation and replacement.
-public struct XAttrOptions: OptionSetType {
+public struct XAttrOptions: OptionSet {
     public let rawValue: CInt
 
     public init(rawValue: CInt) { self.rawValue = rawValue }
@@ -65,11 +65,11 @@ public struct XAttrOptions: OptionSetType {
 /// - requires: `removeExtendedAttribute(forName:options:)`
 public protocol ExtendedAttributeHandler {
     /// Retrieve a list of extended attribute names associated with a file system object.
-    func extendedAttributeNames(options options: XAttrOptions) throws -> [String]
+    func extendedAttributeNames(options: XAttrOptions) throws -> [String]
     /// Retrieve the value for the extended attribute specified by _name_ associated with a file system object.
     func extendedAttributeValue(forName name: String, options: XAttrOptions) throws -> NSData
     /// Set a _name_:_value_ extended attribute on a file system object.
-    func setExtendedAttribute(name name: String, value: NSData, options: XAttrOptions) throws
+    func setExtendedAttribute(name: String, value: NSData, options: XAttrOptions) throws
     /// Remove the extended attribute specified by _name_ associated with a file system object.
     func removeExtendedAttribute(forName name: String, options: XAttrOptions) throws
     /// Retrieve the values for multiple extended attributes. A default implementation of this method is provided.
@@ -187,8 +187,8 @@ extension ExtendedAttributeHandler {
 ///           `NSCocoaErrorDomain` and error code `NSFileReadInapplicableStringEncodingError` is thrown.
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/listxattr.2.html
-private func listXAttr<T>(target target: T, options: XAttrOptions, listFunc: (T, UnsafeMutablePointer<CChar>, size_t, CInt) -> ssize_t) throws -> [String] {
-    assert(options.isSubsetOf([.NoFollow, .ShowCompression]),
+private func listXAttr<T>(target: T, options: XAttrOptions, listFunc: (T, UnsafeMutablePointer<CChar>?, size_t, CInt) -> ssize_t) throws -> [String] {
+    assert(options.isSubset(of: [.NoFollow, .ShowCompression]),
         "Extended attribute lister only supports the following XAttrOptions: .NoFollow, .ShowCompression")
 
     let size = listFunc(target, nil, 0, options.rawValue)               // Get the size of the attributes' names.
@@ -198,18 +198,22 @@ private func listXAttr<T>(target target: T, options: XAttrOptions, listFunc: (T,
         default: break                                                  // Got the size, continue on.
     }
 
-    let data = NSMutableData(length: size)!                             // This allocation should never fail.
-    guard listFunc(target, UnsafeMutablePointer<CChar>(data.mutableBytes), data.length, options.rawValue) != -1 else {
+    var data = Data(count: size)
+    let errcode = data.withUnsafeMutableBytes{(bytes: UnsafeMutablePointer<CChar>) in
+        return listFunc(target, bytes, size, options.rawValue)
+    }
+
+    guard errcode != -1 else {
         throw NSError.POSIX(errno: errno)
     }
 
-    guard let list = String(data: data, encoding: NSUTF8StringEncoding) else {
+    guard let list = String(data: data, encoding: .utf8) else {
         throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadInapplicableStringEncodingError, userInfo: [
             NSLocalizedDescriptionKey: "Could not decode extended attribute names.",
-            NSStringEncodingErrorKey: NSNumber(unsignedInteger: NSUTF8StringEncoding),
+            NSStringEncodingErrorKey: NSNumber(value: NSUTF8StringEncoding),
         ])
     }
-    return list.componentsSeparatedByString("\0").filter({ !$0.isEmpty })
+    return list.components(separatedBy: "\0").filter({ !$0.isEmpty })
 }
 
 /// Gets an extended attribute value from a file system object.
@@ -234,8 +238,8 @@ private func listXAttr<T>(target target: T, options: XAttrOptions, listFunc: (T,
 ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/getxattr.2.html
-private func getXAttr<T>(target target: T, name: String, options: XAttrOptions, getFunc: (T, UnsafePointer<CChar>, UnsafeMutablePointer<Void>, size_t, CUnsignedInt, CInt) -> ssize_t) throws -> NSData {
-    assert(options.isSubsetOf([.NoFollow, .ShowCompression]),
+private func getXAttr<T>(target: T, name: String, options: XAttrOptions, getFunc: (T, UnsafePointer<CChar>, UnsafeMutableRawPointer?, size_t, CUnsignedInt, CInt) -> ssize_t) throws -> NSData {
+    assert(options.isSubset(of: [.NoFollow, .ShowCompression]),
         "Extended attribute getter only supports the following XAttrOptions: .NoFollow, .ShowCompression")
 
     let size = getFunc(target, name, nil, 0, 0, options.rawValue)       // Get the size of the attribute's value.
@@ -275,8 +279,8 @@ private func getXAttr<T>(target target: T, name: String, options: XAttrOptions, 
 ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/setxattr.2.html
-private func setXAttr<T>(target target: T, name: String, value: NSData, options: XAttrOptions, setFunc: (T, UnsafePointer<CChar>, UnsafePointer<Void>, size_t, CUnsignedInt, CInt) -> CInt) throws {
-    assert(options.isSubsetOf([.NoFollow, .CreateOnly, .ReplaceOnly]),
+private func setXAttr<T>(target: T, name: String, value: NSData, options: XAttrOptions, setFunc: (T, UnsafePointer<CChar>, UnsafeRawPointer, size_t, CUnsignedInt, CInt) -> CInt) throws {
+    assert(options.isSubset(of: [.NoFollow, .CreateOnly, .ReplaceOnly]),
         "Extended attribute setter only supports the following XAttrOptions: .NoFollow, .CreateOnly, .ReplaceOnly")
 
     guard setFunc(target, name, value.bytes, value.length, 0, options.rawValue) == 0 else {
@@ -303,8 +307,8 @@ private func setXAttr<T>(target target: T, name: String, value: NSData, options:
 ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
 ///
 /// [man]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/removexattr.2.html
-private func removeXAttr<T>(target target: T, name: String, options: XAttrOptions, delFunc: (T, UnsafePointer<CChar>, CInt) -> CInt) throws {
-    assert(options.isSubsetOf([.NoFollow, .ShowCompression]),
+private func removeXAttr<T>(target: T, name: String, options: XAttrOptions, delFunc: (T, UnsafePointer<CChar>, CInt) -> CInt) throws {
+    assert(options.isSubset(of: [.NoFollow, .ShowCompression]),
         "Extended attribute remover only supports the following XAttrOptions: .NoFollow, .ShowCompression")
 
     guard delFunc(target, name, options.rawValue) == 0 else {
@@ -335,8 +339,8 @@ extension NSURL: ExtendedAttributeHandler {
     ///           and the _localizedDescription_ property for a description of the error. If the attribute names are
     ///           retrieved, but cannot be read due to bad encoding, an `NSError` with Foundation built-in domain
     ///           `NSCocoaErrorDomain` and error code `NSFileReadInapplicableStringEncodingError` is thrown.
-    public func extendedAttributeNames(options options: XAttrOptions = []) throws -> [String] {
-        assert(self.fileURL, "Extended attributes are only available for file URLs")
+    public func extendedAttributeNames(options: XAttrOptions = []) throws -> [String] {
+        assert(self.isFileURL, "Extended attributes are only available for file URLs")
         return try listXAttr(target: self.fileSystemRepresentation, options: options, listFunc: listxattr)
     }
 
@@ -355,7 +359,7 @@ extension NSURL: ExtendedAttributeHandler {
     /// - throws: `NSError` with Foundation built-in domain `NSPOSIXErrorDomain`. Check the _code_ property for the
     ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
     public func extendedAttributeValue(forName name: String, options: XAttrOptions = []) throws -> NSData {
-        assert(self.fileURL, "Extended attributes are only available for file URLs")
+        assert(self.isFileURL, "Extended attributes are only available for file URLs")
         return try getXAttr(target: self.fileSystemRepresentation, name: name, options: options, getFunc: getxattr)
     }
 
@@ -373,8 +377,8 @@ extension NSURL: ExtendedAttributeHandler {
     ///
     /// - throws: `NSError` with Foundation built-in domain `NSPOSIXErrorDomain`. Check the _code_ property for the
     ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
-    public func setExtendedAttribute(name name: String, value: NSData, options: XAttrOptions = []) throws {
-        assert(self.fileURL, "Extended attributes are only available for file URLs")
+    public func setExtendedAttribute(name: String, value: NSData, options: XAttrOptions = []) throws {
+        assert(self.isFileURL, "Extended attributes are only available for file URLs")
         try setXAttr(target: self.fileSystemRepresentation, name: name, value: value, options: options, setFunc: setxattr)
     }
 
@@ -390,15 +394,15 @@ extension NSURL: ExtendedAttributeHandler {
     /// - throws: `NSError` with Foundation built-in domain `NSPOSIXErrorDomain`. Check the _code_ property for the
     ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
     public func removeExtendedAttribute(forName name: String, options: XAttrOptions = []) throws {
-        assert(self.fileURL, "Extended attributes are only available for file URLs")
+        assert(self.isFileURL, "Extended attributes are only available for file URLs")
         try removeXAttr(target: self.fileSystemRepresentation, name: name, options: options, delFunc: removexattr)
     }
 
 }
 
 
-/// Provides `NSFileHandle` with the ability to manipulate extended attributes associated with file descriptors.
-extension NSFileHandle: ExtendedAttributeHandler {
+/// Provides `FileHandle` with the ability to manipulate extended attributes associated with file descriptors.
+extension FileHandle: ExtendedAttributeHandler {
 
     /// Retrieves the extended attribute names associated with this file.
     ///
@@ -415,7 +419,7 @@ extension NSFileHandle: ExtendedAttributeHandler {
     ///           and the _localizedDescription_ property for a description of the error. If the attribute names are
     ///           retrieved, but cannot be read due to bad encoding, an `NSError` with Foundation built-in domain
     ///           `NSCocoaErrorDomain` and error code `NSFileReadInapplicableStringEncodingError` is thrown.
-    public func extendedAttributeNames(options options: XAttrOptions = []) throws -> [String] {
+    public func extendedAttributeNames(options: XAttrOptions = []) throws -> [String] {
         //TODO: Update this ugly assertion with better FileHandle code.
         assert({ var statbuf: stat = stat(); guard fstat(self.fileDescriptor, &statbuf) == 0 else { return false }
             return Set([S_IFDIR, S_IFREG, S_IFLNK]).contains(statbuf.st_mode & S_IFMT)
@@ -459,7 +463,7 @@ extension NSFileHandle: ExtendedAttributeHandler {
     ///
     /// - throws: `NSError` with Foundation built-in domain `NSPOSIXErrorDomain`. Check the _code_ property for the
     ///           error's POSIX error code, and the _localizedDescription_ property for a description of the error.
-    public func setExtendedAttribute(name name: String, value: NSData, options: XAttrOptions = []) throws {
+    public func setExtendedAttribute(name: String, value: NSData, options: XAttrOptions = []) throws {
         //TODO: Update this ugly assertion with better FileHandle code.
         assert({ var statbuf: stat = stat(); guard fstat(self.fileDescriptor, &statbuf) == 0 else { return false }
             return Set([S_IFDIR, S_IFREG, S_IFLNK]).contains(statbuf.st_mode & S_IFMT)
@@ -508,9 +512,10 @@ extension NSError {
     /// - parameter userInfo: Any additional data to include with the error.
     ///
     /// - returns: An `NSError` object with the domain `NSPOSIXErrorDomain`.
-    private class func POSIX(errno errNo: errno_t, userInfo: [NSObject: AnyObject]? = nil) -> Self {
+    fileprivate class func POSIX(errno errNo: errno_t, userInfo: [String: Any]? = nil) -> Self {
         return self.init(domain: NSPOSIXErrorDomain, code: Int(errNo), userInfo: {
-            if userInfo?[NSLocalizedDescriptionKey] == nil, let description = String(UTF8String: strerror(errNo)) {
+            if userInfo?[NSLocalizedDescriptionKey] == nil {
+                let description = String(cString: strerror(errNo))
                 var mutableUserInfo = userInfo ?? [:]
                 mutableUserInfo[NSLocalizedDescriptionKey] = description
                 return mutableUserInfo
@@ -523,7 +528,7 @@ extension NSError {
     /// The system _errno_ as captured when the `NSError` object was created.
     ///
     /// - important: This attribute is only available for errors with the domain `NSPOSIXErrorDomain`.
-    private var errno: errno_t {
+    fileprivate var errno: errno_t {
         assert(self.domain == NSPOSIXErrorDomain, "errno is only available for POSIX errors")
         return errno_t(self.code)
     }
