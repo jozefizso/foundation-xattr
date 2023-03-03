@@ -38,6 +38,16 @@ let package = Package(
         .target(
             name: "XAttr",
             path: "Sources/"
-        )
+        ),
+        .testTarget(
+            name: "XAttrTests",
+            dependencies: [
+                "XAttr",
+            ],
+            path: "Tests/",
+            resources: [
+                .process("Resources"),
+            ]
+        ),
     ]
 )
