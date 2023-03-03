@@ -44,7 +44,10 @@ let package = Package(
             dependencies: [
                 "XAttr",
             ],
-            path: "Tests/"
+            path: "Tests/",
+            resources: [
+                .process("Resources"),
+            ]
         ),
     ]
 )
