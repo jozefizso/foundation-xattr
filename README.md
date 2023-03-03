@@ -2,7 +2,7 @@
 
 Foundation-XAttr makes working with [Extended Attributes][wiki-xattr] a natural part of Foundation. Both `NSURL` and `NSFileHandle` objects gain the ability to read and write extended attributes using an API that fits right in with Cocoa. Add the power of metadata to your app!
 
-Works with iOS, macOS, and tvOS.
+Works with iOS, macOS, watchOS and tvOS.
 
 For more info on Darwin's extended attribute APIs – which underlie this module – see Apple's man pages for [listxattr][man-listxattr], [getxattr][man-getxattr], [setxattr][man-setxattr], and [removexattr][man-removexattr].
 
@@ -36,7 +36,7 @@ try myURL.removeExtendedAttributes(forNames: nil)
 
 ## Installation
 
-Requires Swift 2.2.
+Requires Swift 5.3.
 
 ### Swift Package Manager
 
@@ -50,7 +50,7 @@ import PackageDescription
 let package = Package(
     name: "YourProjectName",
     dependencies: [
-        .Package(url: "https://github.com/overbuilt/foundation-xattr.git", majorVersion: 1),
+        .package(url: "https://github.com/jozefizso/foundation-xattr", majorVersion: 1),
     ]
 )
 
@@ -149,4 +149,4 @@ Foundation-XAttr is licensed under the permissive [ISC License][license].
 [man-getxattr]: https://developer.apple.com/library/ios/documentation/System/Conceptual/ManPages_iPhoneOS/man2/getxattr.2.html
 [man-setxattr]: https://developer.apple.com/library/ios/documentation/System/Conceptual/ManPages_iPhoneOS/man2/setxattr.2.html
 [man-removexattr]: https://developer.apple.com/library/ios/documentation/System/Conceptual/ManPages_iPhoneOS/man2/removexattr.2.html
-[license]: https://github.com/overbuilt/foundation-xattr/blob/master/LICENSE
+[license]: LICENSE.txt

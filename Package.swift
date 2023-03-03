@@ -1,3 +1,5 @@
+// swift-tools-version:5.3
+
 // ISC License
 //
 // Copyright (c) 2016, Justin Pawela and contributors
@@ -16,7 +18,26 @@
 
 import PackageDescription
 
-
 let package = Package(
-    name: "Foundation-XAttr"
+    name: "Foundation-XAttr",
+    platforms: [
+        .iOS(.v14),
+        .macOS(.v10_13),
+        .watchOS(.v7),
+        .tvOS(.v14)
+    ],
+    products: [
+        .library(
+            name: "Foundation-XAttr",
+            targets: [
+                "Foundation-XAttr",
+            ]
+        ),
+    ],
+    targets: [
+        .target(
+            name: "Foundation-XAttr",
+            path: "Sources/"
+        )
+    ]
 )
