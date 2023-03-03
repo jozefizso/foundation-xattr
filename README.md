@@ -12,12 +12,15 @@ For more info on Darwin's extended attribute APIs – which underlie this module
 Here's a simple example of working with extended attributes using a file URL:
 
 ```swift
+import XAttr
+
 let myURL = NSURL(fileURLWithPath: "/path/to/file")
 
-let data = "value".dataUsingEncoding(NSUTF8StringEncoding)!
+let data = "value".data(using: .utf8)!
+let nsdata = NSData(data: data)
 
 // Set an attribute
-try myURL.setExtendedAttribute(name: "com.example.attribute", value: data)
+try myURL.setExtendedAttribute(name: "com.example.attribute", value: nsdata)
 // List attributes
 let names = try myURL.extendedAttributeNames()
 // Get an attribute's value
@@ -26,7 +29,7 @@ let value = try myURL.extendedAttributeValue(forName: "com.example.attribute")
 try myURL.removeExtendedAttribute(forName: "com.example.attribute")
 
 // Set multiple attributes
-try myURL.setExtendedAttributes(["com.example.attribute1": data, "com.example.attribute2": data])
+try myURL.setExtendedAttributes(attrs: ["com.example.attribute1": nsdata, "com.example.attribute2": nsdata])
 // Get multiple attributes' values (all available)
 let attrs = try myURL.extendedAttributeValues(forNames: nil)
 // Remove multiple attributes (all)
@@ -91,7 +94,7 @@ setExtendedAttribute(name: String, value: NSData, options: XAttrOptions = []) th
 #### Setting Multiple Attributes' Values
 
 ```swift
-setExtendedAttributes(_: [String: NSData], options: XAttrOptions = []) throws
+setExtendedAttributes(attrs: [String: NSData], options: XAttrOptions = []) throws
 ```
 
 Supply a dictionary of _name_:_value_ pairs to be set on the target.
