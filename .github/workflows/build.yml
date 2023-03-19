@@ -30,8 +30,11 @@ jobs:
         --output-path ./XAttr.doccarchive \
         --transform-for-static-hosting
 
+    - name: compress documentation
+      run: tar -zcvf XAttr.doccarchive.tar.gz XAttr.doccarchive
+
     - name: publish documentation
       uses: actions/upload-artifact@v3
       with:
-        name: XAttr.doccarchive
-        path: XAttr.doccarchive
+        name: XAttr.doccarchive.tar.gz
+        path: XAttr.doccarchive.tar.gz
