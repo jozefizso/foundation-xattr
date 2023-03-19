@@ -21,3 +21,17 @@ jobs:
 
     - name: tests
       run: swift test -v
+
+    - name: documentation
+      run: |
+        swift package \
+        --allow-writing-to-directory ./XAttr.doccarchive \
+        generate-documentation \
+        --output-path ./XAttr.doccarchive \
+        --transform-for-static-hosting
+
+    - name: publish documentation
+      uses: actions/upload-artifact@v3
+      with:
+        name: XAttr.doccarchive
+        path: XAttr.doccarchive
