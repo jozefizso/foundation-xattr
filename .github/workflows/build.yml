@@ -3,7 +3,7 @@ name: build
 
 on:
   push:
-    branches: [ "main", "tests" ]
+    branches: [ "main", "tests", "modernize" ]
   pull_request:
     branches: [ "main" ]
 
