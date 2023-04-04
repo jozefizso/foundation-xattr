@@ -14,13 +14,12 @@ Here's a simple example of working with extended attributes using a file URL:
 ```swift
 import XAttr
 
-let myURL = NSURL(fileURLWithPath: "/path/to/file")
+let myURL = URL(fileURLWithPath: "/path/to/file")
 
 let data = "value".data(using: .utf8)!
-let nsdata = NSData(data: data)
 
 // Set an attribute
-try myURL.setExtendedAttribute(name: "com.example.attribute", value: nsdata)
+try myURL.setExtendedAttribute(name: "com.example.attribute", value: data)
 // List attributes
 let names = try myURL.extendedAttributeNames()
 // Get an attribute's value
@@ -29,7 +28,7 @@ let value = try myURL.extendedAttributeValue(forName: "com.example.attribute")
 try myURL.removeExtendedAttribute(forName: "com.example.attribute")
 
 // Set multiple attributes
-try myURL.setExtendedAttributes(attrs: ["com.example.attribute1": nsdata, "com.example.attribute2": nsdata])
+try myURL.setExtendedAttributes(attrs: ["com.example.attribute1": data, "com.example.attribute2": data])
 // Get multiple attributes' values (all available)
 let attrs = try myURL.extendedAttributeValues(forNames: nil)
 // Remove multiple attributes (all)
@@ -39,7 +38,7 @@ try myURL.removeExtendedAttributes(forNames: nil)
 
 ## Installation
 
-Requires Swift 5.3.
+Requires Swift 5.7.
 
 ### Swift Package Manager
 
@@ -58,10 +57,6 @@ let package = Package(
 )
 ```
 
-### Source
-
-If you cannot use the Swift Package Manager, just copy the `Sources/XAttr.swift` file into your project.
-
 
 ## Usage
 
@@ -69,7 +64,7 @@ XAttr is easy to use. This section contains the all the basic information requir
 
 ### Methods
 
-The following methods are available to both `NSURL` and `NSFileHandle` objects:
+The following methods are available to both `URL` and `FileHandle` objects:
 
 #### Retrieving an Attribute's Value
 
@@ -145,6 +140,9 @@ Finally, if an error is encountered while getting/setting/removing multiple exte
 
 XAttr is licensed under the permissive [ISC License][license].  
 XAttr is a fork of [Foundation-XAttr][upstream] repository.
+
+Copyright (c) 2016, Justin Pawela and contributors
+Copyright 2023 Cisco Systems, Inc.
 
 
 [wiki-xattr]: https://en.wikipedia.org/wiki/Extended_file_attributes

@@ -15,11 +15,21 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+@testable import XAttr
 import XCTest
 
-/// Ensures at least one unit test will pass.
-final class AlwaysPassTests: XCTestCase {
-    func test_alwaysPass() throws {
-        XCTAssertTrue(true, "This test will always pass.")
+final class SetExtendedAttributeTests: XCTestCase {
+    func test_URL_setExtendedAttribute() throws {
+        throw XCTSkip("TODO: Rewrite this integration test")
+
+        // Arrange
+        let file = URL(fileURLWithPath: "/Users/jozef/Developer/foundation-xattr/tmp/myfile.txt")
+        let attributeValue = "value".data(using: .utf8)!
+
+        // Act
+        try file.setExtendedAttribute(name: "com.example.attribute", value: attributeValue)
+
+        // Assert
+        XCTAssertTrue(true)
     }
 }

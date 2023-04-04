@@ -3,7 +3,7 @@ name: build
 
 on:
   push:
-    branches: [ "main", "tests" ]
+    branches: [ "main", "tests", "modernize" ]
   pull_request:
     branches: [ "main" ]
 
@@ -21,3 +21,20 @@ jobs:
 
     - name: tests
       run: swift test -v
+
+    - name: documentation
+      run: |
+        swift package \
+        --allow-writing-to-directory ./XAttr.doccarchive \
+        generate-documentation \
+        --output-path ./XAttr.doccarchive \
+        --transform-for-static-hosting
+
+    - name: compress documentation
+      run: tar -zcvf XAttr.doccarchive.tar.gz XAttr.doccarchive
+
+    - name: publish documentation
+      uses: actions/upload-artifact@v3
+      with:
+        name: XAttr.doccarchive.tar.gz
+        path: XAttr.doccarchive.tar.gz
