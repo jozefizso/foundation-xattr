@@ -4,7 +4,7 @@ import XCTest
 final class ExtendedAttributeNamesTests: XCExtendedAttributeTestCase {
     func test_fileWithoutAttributes_returnsEmptyArray() throws {
         let testFilePath = resourcesBundle.path(forResource: "01-SimpleFile", ofType: ".txt")!
-        let testFile = NSURL(fileURLWithPath: testFilePath)
+        let testFile = URL(fileURLWithPath: testFilePath)
 
         let names = try testFile.extendedAttributeNames()
 
@@ -12,7 +12,7 @@ final class ExtendedAttributeNamesTests: XCExtendedAttributeTestCase {
     }
 
     func test_nonExistingFile_throwsError() throws {
-        let testFile = NSURL(fileURLWithPath: "file-does-not-exists.png", relativeTo: self.tempPath)
+        let testFile = URL(fileURLWithPath: "file-does-not-exists.png", relativeTo: self.tempPath)
         XCTAssertThrowsError(try testFile.extendedAttributeNames()) { error in
             XCTAssertEqual(error.localizedDescription, "No such file or directory")
         }
