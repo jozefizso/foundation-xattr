@@ -141,6 +141,9 @@ Finally, if an error is encountered while getting/setting/removing multiple exte
 XAttr is licensed under the permissive [ISC License][license].  
 XAttr is a fork of [Foundation-XAttr][upstream] repository.
 
+Copyright (c) 2016, Justin Pawela and contributors
+Copyright 2023 Cisco Systems, Inc.
+
 
 [wiki-xattr]: https://en.wikipedia.org/wiki/Extended_file_attributes
 [man-listxattr]: https://developer.apple.com/library/ios/documentation/System/Conceptual/ManPages_iPhoneOS/man2/listxattr.2.html
