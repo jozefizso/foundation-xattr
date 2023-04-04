@@ -52,7 +52,7 @@ import PackageDescription
 let package = Package(
     name: "YourProjectName",
     dependencies: [
-        .package(url: "https://github.com/jozefizso/swift-xattr", majorVersion: 1),
+        .package(url: "https://github.com/jozefizso/swift-xattr", majorVersion: 3),
     ]
 )
 ```
@@ -69,13 +69,13 @@ The following methods are available to both `URL` and `FileHandle` objects:
 #### Retrieving an Attribute's Value
 
 ```swift
-extendedAttributeValue(forName: String, options: XAttrOptions = []) throws -> NSData
+extendedAttributeValue(forName: String, options: XAttrOptions = []) throws -> Data
 ```
 
 #### Retrieving Multiple Attributes' Values
 
 ```swift
-extendedAttributeValues(forNames: [String]?, options: XAttrOptions = []) throws -> [String: NSData]
+extendedAttributeValues(forNames: [String]?, options: XAttrOptions = []) throws -> [String: Data]
 ```
 
 Supply a list of names to retrieve, or `nil` to retrieve all available attributes.
@@ -83,13 +83,13 @@ Supply a list of names to retrieve, or `nil` to retrieve all available attribute
 #### Setting an Attribute's Value
 
 ```swift
-setExtendedAttribute(name: String, value: NSData, options: XAttrOptions = []) throws
+setExtendedAttribute(name: String, value: Data, options: XAttrOptions = []) throws
 ```
 
 #### Setting Multiple Attributes' Values
 
 ```swift
-setExtendedAttributes(attrs: [String: NSData], options: XAttrOptions = []) throws
+setExtendedAttributes(attrs: [String: Data], options: XAttrOptions = []) throws
 ```
 
 Supply a dictionary of _name_:_value_ pairs to be set on the target.
