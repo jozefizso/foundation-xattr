@@ -39,7 +39,7 @@ try myURL.removeExtendedAttributes(forNames: nil)
 
 ## Installation
 
-Requires Swift 5.3.
+Requires Swift 5.7.
 
 ### Swift Package Manager
 
@@ -57,10 +57,6 @@ let package = Package(
     ]
 )
 ```
-
-### Source
-
-If you cannot use the Swift Package Manager, just copy the `Sources/XAttr.swift` file into your project.
 
 
 ## Usage

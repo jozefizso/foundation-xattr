@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.7
 
 // ISC License
 //
@@ -22,7 +22,7 @@ let package = Package(
     name: "XAttr",
     platforms: [
         .iOS(.v14),
-        .macOS(.v10_13),
+        .macOS(.v11),
         .watchOS(.v7),
         .tvOS(.v14)
     ],
